@@ -58,8 +58,11 @@ function SeaFight (fieldSize) {
 
 	this.autoShips = function() {
 		var x, y;
-		//1 4х палубный
 		var shipCoordinates =[];
+		var borderCoordinates =[];
+		var doneFlag = true;
+		var border =[];
+		//1 4х палубный
 		do {
 			var vector = [1, 2, 3, 4];
 			do {
@@ -67,43 +70,338 @@ function SeaFight (fieldSize) {
 				y = rand(0, fieldSize);
 			}
 			while (field[x][y].chip !== 'w');
-			shipCoordinates[0] ={x: x,y: y};
-			var moveTo = rand(0 , vector.length-1);
-			switch (vector[moveTo]) {
-				case 1: {
-					break;
-				}
-				case 2:
-				{
-					//проверка поставить вправо
-					for (var iShip = 1; iShip < 4; iShip++) {
-						if (validate(x, y - iShip) && field[x][y - iShip].chip == 'w') {
-							shipCoordinates[iShip] = {
-								x: x,
-								y: y - iShip
-							};
-						} else {
-							shipCoordinates = [];
-							break;
+			do {
+				shipCoordinates[0] ={x: x,y: y};
+				var moveTo = rand(0 , vector.length-1);
+				switch (vector[moveTo]) {
+					case 1: {//проверка поставить вверх
+						doneFlag = true;
+						for (var iShip = 1; iShip < 4; iShip++) {
+							if (validate(x - iShip, y) && field[x - iShip][y].chip == 'w') {
+								shipCoordinates[iShip] = {
+									x: x- iShip,
+									y: y
+								};
+							} else {
+								doneFlag = false;
+								shipCoordinates = [];
+								break;
+							}
 						}
+						if (doneFlag) { //проверяем и отмечаем границы
+							 border = [{x: x+1, y: y-1 }, {x: x, y: y-1}, {x: x-1, y: y-1}, {x: x-2, y: y-1}, {x: x-3, y: y-1}, 
+							 			{x: x-4, y: y-1}, {x: x-4, y: y}, {x: x-4, y: y+1}, {x: x-3, y: y+1}, {x: x-2, y: y+1}, 
+							 			{x: x-1, y: y+1}, {x: x, y: y+1}, {x: x+1, y: y+1}, {x: x+1, y: y}];
+							borderCoordinates = checkBorders(border);
+							doneFlag = !!borderCoordinates;
+						}
+						break;
 					}
-				break;
-				}
-				case 3: {
+					case 2: {//проверка поставить вправо
+						doneFlag = true;
+						for (var iShip = 1; iShip < 4; iShip++) {
+							if (validate(x, y + iShip) && field[x][y + iShip].chip == 'w') {
+								shipCoordinates[iShip] = {
+									x: x,
+									y: y + iShip
+								};
+							} else {
+								doneFlag = false;
+								shipCoordinates = [];
+								break;
+							}
+						}
+						if (doneFlag) { //проверяем и отмечаем границы
+							 border = [{x: x, y: y-1 }, {x: x-1, y: y-1}, {x: x-1, y: y}, {x: x-1, y: y+1}, {x: x-1, y: y+2}, 
+							 			{x: x-1, y: y+3}, {x: x-1, y: y+4}, {x: x, y: y+4}, {x: x+1, y: y+4}, {x: x+1, y: y+3}, 
+							 			{x: x+1, y: y+2}, {x: x+1, y: y+1}, {x: x+1, y: y}, {x: x+1, y: y-1}];
+							borderCoordinates = checkBorders(border);
+							doneFlag = !!borderCoordinates;
+						}
 					break;
+					}
+					case 3: {//проверка поставить вниз
+						doneFlag = true;
+						for (var iShip = 1; iShip < 4; iShip++) {
+							if (validate(x + iShip, y) && field[x + iShip][y].chip == 'w') {
+								shipCoordinates[iShip] = {
+									x: x + iShip,
+									y: y
+								};
+							} else {
+								doneFlag = false;
+								shipCoordinates = [];
+								break;
+							}
+						}
+						if (doneFlag) { //проверяем и отмечаем границы
+							 border = [{x: x-1, y: y-1 }, {x: x, y: y-1}, {x: x+1, y: y-1}, {x: x+2, y: y-1}, {x: x+3, y: y-1}, 
+							 			{x: x+4, y: y-1}, {x: x+4, y: y}, {x: x+4, y: y+1}, {x: x+3, y: y+1}, {x: x+2, y: y+1}, 
+							 			{x: x+1, y: y+1}, {x: x, y: y+1}, {x: x-1, y: y+1}, {x: x-1, y: y}];
+							borderCoordinates = checkBorders(border);
+							doneFlag = !!borderCoordinates;
+						}
+						break;
+					}
+					case 4: {//проверка поставить влево
+						doneFlag = true;
+						for (var iShip = 1; iShip < 4; iShip++) {
+							if (validate(x, y - iShip) && field[x][y - iShip].chip == 'w') {
+								shipCoordinates[iShip] = {
+									x: x,
+									y: y - iShip
+								};
+							} else {
+								doneFlag = false;
+								shipCoordinates = [];
+								break;
+							}
+						}
+						if (doneFlag) { //проверяем и отмечаем границы
+							 border = [{x: x, y: y+1 }, {x: x-1, y: y+1}, {x: x-1, y: y}, {x: x-1, y: y-1}, {x: x-1, y: y-2}, 
+							 			{x: x-1, y: y-3}, {x: x-1, y: y-4}, {x: x, y: y-4}, {x: x+1, y: y-4}, {x: x+1, y: y-3}, 
+							 			{x: x+1, y: y-2}, {x: x+1, y: y-1}, {x: x+1, y: y}, {x: x+1, y: y+1}];
+							borderCoordinates = checkBorders(border);
+							doneFlag = !!borderCoordinates;
+						}
+						break;
+					}
 				}
-				case 4: {
-					break;
-				}
+				vector.splice (moveTo,1);
 			}
-			vector.splice (moveTo,1);
+			while (!doneFlag && vector.length > 0)
 
 		}
-		while (shipCoordinates.length == 0);
+		while ( !doneFlag);
 		FillFieldByCoordinates ('s',shipCoordinates);
+		FillFieldByCoordinates( 'b', borderCoordinates);
 		//------------------------------------------------
+		//2 3х палубных
+		for (var count = 0; count < 2; count++) {
+			do {
+			var vector = [1, 2, 3, 4];
+			do {
+				x = rand(0, fieldSize);
+				y = rand(0, fieldSize);
+			}
+			while (field[x][y].chip !== 'w');
+			do {
+				shipCoordinates[0] ={x: x,y: y};
+				var moveTo = rand(0 , vector.length-1);
+				switch (vector[moveTo]) {
+					case 1: {//проверка поставить вверх
+						doneFlag = true;
+						for (var iShip = 1; iShip < 3; iShip++) {
+							if (validate(x - iShip, y) && field[x - iShip][y].chip == 'w') {
+								shipCoordinates[iShip] = {
+									x: x- iShip,
+									y: y
+								};
+							} else {
+								doneFlag = false;
+								shipCoordinates = [];
+								break;
+							}
+						}
+						if (doneFlag) { //проверяем и отмечаем границы
+							 border = [{x: x+1, y: y-1 }, {x: x, y: y-1}, {x: x-1, y: y-1}, {x: x-2, y: y-1}, {x: x-3, y: y-1}, 
+							 			{x: x-3, y: y}, {x: x-3, y: y+1}, {x: x-2, y: y+1},	{x: x-1, y: y+1}, {x: x, y: y+1}, {x: x+1, y: y+1}, {x: x+1, y: y}];
+							borderCoordinates = checkBorders(border);
+							doneFlag = !!borderCoordinates;
+						}
+						break;
+					}
+					case 2: {//проверка поставить вправо
+						doneFlag = true;
+						for (var iShip = 1; iShip < 3; iShip++) {
+							if (validate(x, y + iShip) && field[x][y + iShip].chip == 'w') {
+								shipCoordinates[iShip] = {
+									x: x,
+									y: y + iShip
+								};
+							} else {
+								doneFlag = false;
+								shipCoordinates = [];
+								break;
+							}
+						}
+						if (doneFlag) { //проверяем и отмечаем границы
+							 border = [{x: x, y: y-1 }, {x: x-1, y: y-1}, {x: x-1, y: y}, {x: x-1, y: y+1}, {x: x-1, y: y+2}, 
+							 			{x: x-1, y: y+3}, {x: x, y: y+3}, {x: x+1, y: y+3}, 
+							 			{x: x+1, y: y+2}, {x: x+1, y: y+1}, {x: x+1, y: y}, {x: x+1, y: y-1}];
+							borderCoordinates = checkBorders(border);
+							doneFlag = !!borderCoordinates;
+						}
+					break;
+					}
+					case 3: {//проверка поставить вниз
+						doneFlag = true;
+						for (var iShip = 1; iShip < 3; iShip++) {
+							if (validate(x + iShip, y) && field[x + iShip][y].chip == 'w') {
+								shipCoordinates[iShip] = {
+									x: x + iShip,
+									y: y
+								};
+							} else {
+								doneFlag = false;
+								shipCoordinates = [];
+								break;
+							}
+						}
+						if (doneFlag) { //проверяем и отмечаем границы
+							 border = [{x: x-1, y: y-1 }, {x: x, y: y-1}, {x: x+1, y: y-1}, {x: x+2, y: y-1}, {x: x+3, y: y-1}, 
+							 			 {x: x+3, y: y}, {x: x+3, y: y+1}, {x: x+2, y: y+1}, 
+							 			{x: x+1, y: y+1}, {x: x, y: y+1}, {x: x-1, y: y+1}, {x: x-1, y: y}];
+							borderCoordinates = checkBorders(border);
+							doneFlag = !!borderCoordinates;
+						}
+						break;
+					}
+					case 4: {//проверка поставить влево
+						doneFlag = true;
+						for (var iShip = 1; iShip < 3; iShip++) {
+							if (validate(x, y - iShip) && field[x][y - iShip].chip == 'w') {
+								shipCoordinates[iShip] = {
+									x: x,
+									y: y - iShip
+								};
+							} else {
+								doneFlag = false;
+								shipCoordinates = [];
+								break;
+							}
+						}
+						if (doneFlag) { //проверяем и отмечаем границы
+							 border = [{x: x, y: y+1 }, {x: x-1, y: y+1}, {x: x-1, y: y}, {x: x-1, y: y-1}, {x: x-1, y: y-2}, 
+							 			{x: x-1, y: y-3}, {x: x, y: y-3}, {x: x+1, y: y-3}, 
+							 			{x: x+1, y: y-2}, {x: x+1, y: y-1}, {x: x+1, y: y}, {x: x+1, y: y+1}];
+							borderCoordinates = checkBorders(border);
+							doneFlag = !!borderCoordinates;
+						}
+						break;
+					}
+				}
+				vector.splice (moveTo,1);
+			}
+			while (!doneFlag && vector.length > 0)
+
+		}
+		while ( !doneFlag);
+		FillFieldByCoordinates ('s',shipCoordinates);
+		FillFieldByCoordinates( 'b', borderCoordinates);
+		}
+		//3 2х палубных
+		for (var count = 0; count < 3; count++) {
+			do {
+			var vector = [1, 2, 3, 4];
+			do {
+				x = rand(0, fieldSize);
+				y = rand(0, fieldSize);
+			}
+			while (field[x][y].chip !== 'w');
+			do {
+				shipCoordinates[0] ={x: x,y: y};
+				var moveTo = rand(0 , vector.length-1);
+				switch (vector[moveTo]) {
+					case 1: {//проверка поставить вверх
+						doneFlag = true;
+						for (var iShip = 1; iShip < 2; iShip++) {
+							if (validate(x - iShip, y) && field[x - iShip][y].chip == 'w') {
+								shipCoordinates[iShip] = {
+									x: x- iShip,
+									y: y
+								};
+							} else {
+								doneFlag = false;
+								shipCoordinates = [];
+								break;
+							}
+						}
+						if (doneFlag) { //проверяем и отмечаем границы
+							 border = [{x: x+1, y: y-1 }, {x: x, y: y-1}, {x: x-1, y: y-1}, {x: x-2, y: y-1},
+							 			{x: x-2, y: y}, {x: x-2, y: y+1},	{x: x-1, y: y+1}, {x: x, y: y+1}, {x: x+1, y: y+1}, {x: x+1, y: y}];
+							borderCoordinates = checkBorders(border);
+							doneFlag = !!borderCoordinates;
+						}
+						break;
+					}
+					case 2: {//проверка поставить вправо
+						doneFlag = true;
+						for (var iShip = 1; iShip < 2; iShip++) {
+							if (validate(x, y + iShip) && field[x][y + iShip].chip == 'w') {
+								shipCoordinates[iShip] = {
+									x: x,
+									y: y + iShip
+								};
+							} else {
+								doneFlag = false;
+								shipCoordinates = [];
+								break;
+							}
+						}
+						if (doneFlag) { //проверяем и отмечаем границы
+							 border = [{x: x, y: y-1 }, {x: x-1, y: y-1}, {x: x-1, y: y}, {x: x-1, y: y+1}, {x: x-1, y: y+2}, 
+							 			{x: x, y: y+2},	{x: x+1, y: y+2}, {x: x+1, y: y+1}, {x: x+1, y: y}, {x: x+1, y: y-1}];
+							borderCoordinates = checkBorders(border);
+							doneFlag = !!borderCoordinates;
+						}
+					break;
+					}
+					case 3: {//проверка поставить вниз
+						doneFlag = true;
+						for (var iShip = 1; iShip < 2; iShip++) {
+							if (validate(x + iShip, y) && field[x + iShip][y].chip == 'w') {
+								shipCoordinates[iShip] = {
+									x: x + iShip,
+									y: y
+								};
+							} else {
+								doneFlag = false;
+								shipCoordinates = [];
+								break;
+							}
+						}
+						if (doneFlag) { //проверяем и отмечаем границы
+							 border = [{x: x-1, y: y-1 }, {x: x, y: y-1}, {x: x+1, y: y-1}, {x: x+2, y: y-1},
+							 			 {x: x+2, y: y}, {x: x+2, y: y+1},{x: x+1, y: y+1}, {x: x, y: y+1}, {x: x-1, y: y+1}, {x: x-1, y: y}];
+							borderCoordinates = checkBorders(border);
+							doneFlag = !!borderCoordinates;
+						}
+						break;
+					}
+					case 4: {//проверка поставить влево
+						doneFlag = true;
+						for (var iShip = 1; iShip < 2; iShip++) {
+							if (validate(x, y - iShip) && field[x][y - iShip].chip == 'w') {
+								shipCoordinates[iShip] = {
+									x: x,
+									y: y - iShip
+								};
+							} else {
+								doneFlag = false;
+								shipCoordinates = [];
+								break;
+							}
+						}
+						if (doneFlag) { //проверяем и отмечаем границы
+							 border = [{x: x, y: y+1 }, {x: x-1, y: y+1}, {x: x-1, y: y}, {x: x-1, y: y-1}, {x: x-1, y: y-2}, 
+							 			{x: x, y: y-2}, {x: x+1, y: y-2}, {x: x+1, y: y-1}, {x: x+1, y: y}, {x: x+1, y: y+1}];
+							borderCoordinates = checkBorders(border);
+							doneFlag = !!borderCoordinates;
+						}
+						break;
+					}
+				}
+				vector.splice (moveTo,1);
+			}
+			while (!doneFlag && vector.length > 0)
+
+		}
+		while ( !doneFlag);
+		FillFieldByCoordinates ('s',shipCoordinates);
+		FillFieldByCoordinates( 'b', borderCoordinates);
+		}
 		//4 однопалубных
-		var borderCoordinates =[];
 		for (var iShip = 0; iShip < 4; iShip++) {
 		do{
 			do {
@@ -111,7 +409,7 @@ function SeaFight (fieldSize) {
 				y = rand(0, fieldSize);
 			}
 			while (field[x][y].chip !== 'w');
-			var border = [{
+			border = [{
 				x: x,
 				y: y - 1
 			}, {
@@ -136,7 +434,26 @@ function SeaFight (fieldSize) {
 				x: x - 1,
 				y: y - 1
 			}];
-			for (var i = 0; i < border.length; i++) {
+			// for (var i = 0; i < border.length; i++) {
+			// 	var bx = +border[i].x;
+			// 	var by = +border[i].y;
+			// 	if (validate(bx, by))
+			// 		if (field[bx][by].chip == 'w' || field[bx][by].chip == 'b') {
+			// 			borderCoordinates.push({x: bx, y: by});
+			// 		} else {
+			// 			borderCoordinates = [];
+			// 			break;
+			// 		}
+			// }
+			borderCoordinates = checkBorders (border);
+		} while (borderCoordinates.length == 0);
+		field[x][y].chip = 's';
+		FillFieldByCoordinates( 'b', borderCoordinates);
+		//-------------------------------------------------
+	}
+	function checkBorders (border) {
+		var borderCoordinates =[];
+		for (var i = 0; i < border.length; i++) {
 				var bx = +border[i].x;
 				var by = +border[i].y;
 				if (validate(bx, by))
@@ -147,10 +464,7 @@ function SeaFight (fieldSize) {
 						break;
 					}
 			}
-		} while (borderCoordinates.length == 0);
-		field[x][y].chip = 's';
-		FillFieldByCoordinates( 'b', borderCoordinates);
-		//-------------------------------------------------
+			return borderCoordinates;
 	}
 	}
 	function FillFieldByCoordinates(chip,coordinates) {
