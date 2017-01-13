@@ -2,7 +2,9 @@ function rand(min, max) {
 	return Math.floor(Math.random() * (max - min)) + min;
 }
 
+
 function SeaBattle (fieldSize) {
+	var self = this;
 	fieldSize = fieldSize ? fieldSize : 10;
 	var field = [];
 
@@ -17,22 +19,30 @@ function SeaBattle (fieldSize) {
 			}
 		}
 
-	this.shoot = function (x, y) {
-		if (!validate(x, y)) return;
-		field[x][y].chip = true;
+	this.shoot = function (id) {
+		var coordinate = id.split ('_');
+		var x = coordinate[0], y = coordinate[1];
+		if(!validate(x,y)) return;
+		field[x][y].chip ='f';
+		//alert(id);
 	}
 	function validate (x, y) {
 		return x >= 0 && x < fieldSize && y >= 0 && y < fieldSize ? true : false;
 	}
-	this.showTable = function() {
-		var p1 = document.getElementById('battle-field-1');
+	this.showTable = function(fieldId) {
+		var p1 = document.getElementById(fieldId);
 		for (i = 0; i < fieldSize; i++)
 			for (j = 0; j < fieldSize; j++) {
 				var div1 = document.createElement('div');
 				div1.id = i + '_' + j;
 				div1.className = field[i][j].chip;
 				p1.appendChild(div1);
-			}
+				}
+		p1.style.height = p1.style.width = fieldSize*32+'px';
+		p1.onclick = function () {
+			self.shoot(event.target.id);
+			event.target.className = 'f';
+		};
 	}
 
 	this.autoShips = function() {
@@ -159,8 +169,8 @@ function SeaBattle (fieldSize) {
 							}
 						}
 						if (doneFlag) { //проверяем и отмечаем границы
-							 border = [{x: x, y: y-1 }, {x: x-1, y: y-1}, {x: x-1, y: y}, {x: x-1, y: y+1}, {x: x-1, y: y+2}, 
-							 			{x: x-1, y: y+3}, {x: x, y: y+3}, {x: x+1, y: y+3}, 
+							 border = [{x: x, y: y-1 }, {x: x-1, y: y-1}, {x: x-1, y: y}, {x: x-1, y: y+1}, {x: x-1, y: y+2},
+							 			{x: x-1, y: y+3}, {x: x, y: y+3}, {x: x+1, y: y+3},
 							 			{x: x+1, y: y+2}, {x: x+1, y: y+1}, {x: x+1, y: y}, {x: x+1, y: y-1}];
 							borderCoordinates = checkBorders(border);
 							doneFlag = !!borderCoordinates;
@@ -306,10 +316,20 @@ function SeaBattle (fieldSize) {
 		}
 	}
 }
-var seaBattle = new SeaBattle(10);
-
-seaBattle.autoShips();
+var seaBattleUser = new SeaBattle(10);
+var seaBattleComp = new SeaBattle(10);
+seaBattleComp.autoShips();
+seaBattleUser.autoShips();
 //seaFight.shoot(5, 3);
 //seaFight.shoot(7, 5);
 //seaFight.shoot(1, 4);
-window.onload = seaBattle.showTable();
+//window.onload = 
+seaBattleUser.showTable('battle-field-1');
+//window.onload = 
+seaBattleComp.showTable('battle-field-2');
+// document.getElementById('battle-field-2').onclick = function () {
+// 	console.log(this);
+// };
+// for (var i = 0; i < document.getElementById('battle-field-2').childNodes.length; i++) {
+// 	 	document.getElementById('battle-field-2').childNodes[i].onclick = function () {seaBattleComp.shoot(this.id); this.className = 'f';};
+//     }
